@@ -1,0 +1,14 @@
+<script>
+    function myFunction() {
+        var div = document.getElementById('myItems'),
+            clone = div.cloneNode(true);
+        document.body.appendChild(clone);
+    }
+</script>
+
+<div id="myItems">
+    <label>My Label</label>
+    <input type="checkbox" />
+</div>
+<p id="demo">Click the button to clone the above items</p>
+<button onclick="myFunction()">Try it</button>

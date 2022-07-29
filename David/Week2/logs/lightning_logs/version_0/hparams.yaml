@@ -1,0 +1,11 @@
+adam_epsilon: 1.0e-08
+batch_size: 1
+generate_every: 1000
+learning_rate: 0.001
+num_steps: 5000
+num_workers: 1
+pin_memory: false
+save_every: 1000
+use_tpu: false
+warmup_steps: 0
+weight_decay: 0.05

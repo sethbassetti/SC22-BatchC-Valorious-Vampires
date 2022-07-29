@@ -1,0 +1,12 @@
+trained_model
+*bin
+*.sh
+*term
+MNIST
+miniconda3
+nltk_data
+
+
+
+.*
+!.gitignore
