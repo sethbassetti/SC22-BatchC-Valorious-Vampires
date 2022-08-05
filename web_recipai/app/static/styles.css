@@ -137,6 +137,24 @@ img {
     user-select: none;
 }
 
+.loader {
+    z-index: 10;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #0000005d;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader > #pizza {
+    height: 8vh;
+    margin: 24px;
+}
 
 .main-container {
     display: flex;
@@ -174,12 +192,12 @@ img {
     align-items: center;
     justify-content: center;
     width: 100%;
-    
 }
 
 .prompt {
+    background: var(--color-primary);
     margin: 12px 0 8px 0px;
-    color: #ccc;
+    color: var(--color-secondary);
     font-size: 24px;
     padding: 12px 32px;
     border-radius: 32px;
@@ -264,11 +282,21 @@ button.secondary {
     margin: 0 6px;
 }
 
+button.secondary.ico-btn {
+    display: flex; /* makes centering easierrr */
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 100%;
+}
+
 button:hover {
     cursor: pointer;
 }
 
 .buttons-main {
+    display: flex;
+    
     margin-bottom: 48px;
 }
 
@@ -455,6 +483,11 @@ button:hover {
     z-index: 1;
 }
 
+.tl-description > a {
+    color: white;
+    font-weight: bold;
+}
+
 /* under 800px, stack the tl instead */
 @media (max-width: 872px) {
     .timeline-left, .timeline-right {
@@ -503,8 +536,8 @@ button:hover {
 
 }
 
-.info-btn {
-    margin: 12px 0;
+.primary.info-btn {
+    margin: 12px 6px !important;
 }
 
 .name {
@@ -549,9 +582,25 @@ button:hover {
 .banner {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    width: 100%;
-    height: 128px;
+    width: 88vw;
     background-color: #1fbd67;
+    padding: 24px 6vw;
+}
+
+.banner-text {
+    font-size: 6vw;
+    font-style: italic;
+    font-weight: bold;
+    color: #ffffff66;
+    overflow: hidden;
+    user-select: none;
+    margin: -64px;
+}
+
+@media (max-width: 856px) {
+    .banner-text { 
+        display: none;
+    }
 }

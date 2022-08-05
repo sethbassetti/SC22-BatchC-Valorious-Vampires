@@ -4,7 +4,8 @@ _$ = (x) => document.querySelectorAll(`#${x}`)[0];
 let ingredients = []; // List of ingredients to be used in recipie generation
 let position = "run"; // The current section of the page
 let theme = "light";
-    
+let currentRecipe = [];
+
 window.onload = function() {
     // Trigger the scroll event so the navbat is updated properly
     window.dispatchEvent(new Event("scroll"));
@@ -20,8 +21,7 @@ window.onload = function() {
     ];
 
     let selected = prompts[Math.floor(Math.random() * prompts.length)];
-
-    // Later calculate how long the text is so we can figure out what the size of the prompt should be
+    console.log(selected);
     _$("title").innerText = selected;
 
     // Ramdom ingredient placeholders
@@ -69,11 +69,18 @@ window.onload = function() {
         selectedIngredient = sampleIngredients[Math.floor(Math.random() * sampleIngredients.length)];
         _$("input").placeholder = selectedIngredient + "...";
     }, 5000);
+  
+  checkRecipe()
 }
 
 // Listen for the enter key to be pressed
 // Additionally, clear any errors as soon as the user starts typing
 document.addEventListener("keydown", (event) => {
+    // If Alt+Enter or Shift+Enter is pressed, run the sendResults function
+    if (event.key === "Enter" && (event.altKey || event.shiftKey || event.ctrlKey)) {
+        return sendResults();
+    }
+  
     if (event.key === "Enter" && _$("input").value !== "") {
         addItem();
     }
@@ -81,13 +88,13 @@ document.addEventListener("keydown", (event) => {
     if (_$("error").innerText !== "" && event.key !== "Enter") {
         setTimeout(() => _$("error").innerText = "", 200);
     }
-    
+
 });
 
 // Edit the 'scroll' event to track the page position, and update the 
 // position of the navbar indicator proportional to the scroll position
 window.addEventListener("scroll", () => {
-    console.log(window.scrollY >= _$("team").offsetTop, window.scrollY, _$("team").offsetTop);
+    //console.log(window.scrollY >= _$("team").offsetTop, window.scrollY, _$("team").offsetTop);
     // Get the percentage of the page scrolled
     let scrollPercentage = 100 * (window.scrollY / (document.body.scrollHeight - window.innerHeight));
 
@@ -150,7 +157,7 @@ window.addEventListener("scroll", () => {
             }
         }
     } else if (window.scrollY >= _$("team").offsetTop) {
-        console.log("team");
+        //console.log("team");
         position = "team";
 
         // If we're on the team section, change the third navbar-item's
@@ -195,6 +202,7 @@ window.addEventListener("scroll", () => {
     }
 });
     
+
 
 const addItem = () => {
     // ADD MULTI ITEM HANDLING PLEASE !!!!! 
@@ -249,11 +257,12 @@ const removeItem = (item) => {
 
     // Filter out the item from the list 
     ingredients = ingredients.filter(i => i !== item);
-    console.log(ingredients);
+    //console.log(ingredients);
 }
 
 
 const randomize = () => {
+    isRand = true;
     // Dummy list, rewrite with a db of ingredients later
     let sampleIngredients = [
         "dough",
@@ -306,7 +315,7 @@ const setTheme = () => {
     // trigger scroll for a second
     window.scrollBy(0, 2048);
     window.scrollBy(0, -2048);
-    console.log(theme);
+    //console.log(theme);
     // Get the current theme
     let root = document.documentElement;
 
@@ -351,7 +360,7 @@ const setTheme = () => {
         root.style.setProperty("--gradient-light-alt", "linear-gradient(to right,#ffc36e,#ff5757,#9c37be)");
 
         // Fix the color of the down button
-        console.log("fixing color");
+        //console.log("fixing color");
         //_$("next").src = "https://img.icons8.com/ios-glyphs/30/000000/expand-arrow--v1.png";
 
         theme = "light";
@@ -370,13 +379,19 @@ const setTheme = () => {
     }
 }
 
+
 const setRecipe = (data) => {
+  
+    //currentRecipe = data;
     // PAINFUL !!!
     let res = data.split("\n"); // res array
+    
     let genTitle = res.slice(0, res.indexOf(""))[0].trim(); // title
     let ingInstArr = res.slice(res.indexOf("") + 1); // ing and inst
     let genIngredients = ingInstArr.slice(0, ingInstArr.indexOf("")); // ing
     let genInstructions = ingInstArr.slice(ingInstArr.indexOf("") + 1); // inst
+  
+    currentRecipe = [genTitle, genIngredients, genInstructions];
 
     console.log(genTitle, genIngredients, genInstructions);
 
@@ -410,6 +425,11 @@ const setRecipe = (data) => {
 
         instructions.appendChild(span);
     }
+  
+  // Hide the Retry button if we're working with an image (hotfix)
+    if (isImage) {
+      _$("retry").style.display = 'none';
+    }
 }
 
 const goTo = (id) => {
@@ -442,3 +462,10 @@ const goTo = (id) => {
       });
     }
 }
+
+function reveal_the_BUTTON(){
+  _$("copy").style.display = "flex",
+  _$("print").style.display = "flex",
+  _$("save").style.display = "none";
+}
+

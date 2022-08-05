@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>PizzAi - What's cookin'?</title>
         <meta charset="utf-8">
         <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
         <link rel="icon" type="image/png" href="{{url_for('static', filename='img/logo_pizzai.png')}}">
@@ -12,7 +13,7 @@
         <header id="run">
           <a href="{{url_for('home')}}">
                 <img src="{{url_for('static', filename='img/pizzai.svg')}}" />
-                <link rel = "icon" type = "image/x-icon" href="img/pizzai.svg">
+                <link rel="icon" type="image/x-icon" href="img/pizzai.svg">
             </a>
             <div id="nav" class="navbar">
                 <div class="navbar-item" onclick="goTo('run')">
@@ -36,7 +37,15 @@
             </div>
         </header>
 
+        <div class="loader">
+          <!-- .loader is a flex div that covers the entire screen width -->
+          <img id="pizza" src="{{url_for('static', filename='img/pizzai.svg')}}" />
 
+          <!-- KEYFRAME ROTATE THIS IMG !!!!! -->
+          <img id="spin" src="https://img.icons8.com/ios-glyphs/30/ffffff/spinner-frame-5.png"/>
+          <span style="color: white; font-weight: bold;">Thinking...</span>
+
+        </div>
 
         <div class="main-container">
             <div class="main">
@@ -50,21 +59,33 @@
                 
                 <!-- Error text just in case the input is wrong -->
                 <span id="error" class="error"></span>
+              
+                <!-- Another error section for recipe generation errors -->
+                <img id="errIco" style="display: none; margin-bottom: 24px;" src="https://img.icons8.com/ios-glyphs/64/ffffff/error--v1.png"/>
+                <span id="woopsie" style="display: none; color: var(--color-primary); font-size: 24px;">Oops! We dropped the plate!</span>
+                <span id="genError" style="display: none; color: var(--color-primary);">Something went wrong when fetching your recipe.</span>
+                <a id="errRetry" style="display: none; margin-top: 24px; text-decoration: none" href="{{url_for('home')}}">
+                    <button id="new" class="secondary" onclick="window.location.reload()">Try again</button>
+                </a>
 
                 <!-- List items are added to this #list div -->
                 <div id="list" class="list"></div>
 
                 <div id="btn-main" class="buttons-main">
                 <!-- Take a photo button here -->
-                    <input type="file" id="file" style="display:none;" />
-                    <input type="file" id="file" style="display:none;" />
-                    <button class='secondary' id="button" name="button" value="Upload" onclick="fileget();">
+                    <form action="{{url_for('upload_file')}}" method="POST" enctype="multipart/form-data" id="fileForm">
+                      <input type="file" id="file" name="file" style="display:none;" onchange="form.submit()"/>
+                  </form>
+                    
+                    <button class='secondary ico-btn' id="button" name="button" value="Upload" onclick="fileget();">
                         <img src="https://img.icons8.com/ios-glyphs/30/808080/slr-camera.png" />
                     </button>
                     <button class="primary" id="go" onclick="sendResults()">Go!</button>
-                    <button class="secondary" id="rand" onclick="sendResults(randomize())">
+                    <button class="secondary ico-btn" id="rand" onclick="sendResults(randomize())">
                         <img src="https://img.icons8.com/ios-glyphs/30/808080/dice.png" />
                     </button> <!-- Die icon -->
+
+
                 </div>
 
                 <!-- The part where we show the results :D -->
@@ -84,9 +105,19 @@
                 </div>
 
                 <div id="btn-result" class="buttons-main"> <!-- should change this classname -->
-                    <button class="secondary" id="save" onclick="alert('save')">Save</button>
-                    <button class="secondary" id="retry" onclick="alert('retry')">Retry</button>
+
+                  <button class="secondary" id="save" onclick="reveal_the_BUTTON()">Save</button>
+                    <button style="display: none" class="secondary ico-btn" id="print"onclick="printRecipe()">
+                      <img src="https://img.icons8.com/ios-glyphs/30/808080/print.png"/>
+                    </button>
+                    <button style="display: none; padding: 10px 20px !important;" class="secondary" id="copy" onclick="navigator.clipboard.writeText(currentRecipe)">
+                      <img src="https://img.icons8.com/ios-glyphs/30/808080/copy-2.png"/>
+                    </button>
+
+                    <button class="secondary" id="retry" onclick="sendResults(retry())">Retry</button>
+                  <a href="{{url_for('home')}}">
                     <button class="primary" id="new" onclick="window.location.reload()">New Recipe</button>
+                  </a>
                 </div>
                 <!-- nav down button -->
                 <img id="next" class="down" src="" onclick="goTo()" />
@@ -177,7 +208,8 @@
                     <img class="tl-img" src="{{url_for('static', filename='photos/trainingFinal.gif')}}" />
                     <div class="tl-text">
                         <span class="tl-title">Training the Model</span>
-                        <span class="tl-description">To start, we used GPT-2 for our model and then we trained another model on GPT-3. Based on the outputs from these two models we determined that our model on GPT-() had the most accurate outputs and this is the model our site is currently using.</span>
+                        <span class="tl-description">To start, we used GPT-2 for our model, but quickly switched to Gpt-2 + tensor flow which improved model accuracy. After training numerous models on this standard, we made the switch to GPT-3 which has substantially higher quality outputs, which is what we are using today.
+</span>
                     </div>
                 </div>
 
@@ -225,14 +257,14 @@
                 <div id="name" class="info">
                     <span class="name">Ray Li</span>
                     <span class="detail">Data to CSV converter</span>
-                    <button class="primary info-btn">btn</button>
+                    <button class="primary info-btn" onclick="window.open('https://github.com/rayzhili','_blank');">GitHub</button>
                 </div>
                 <div id="name" class="info">
                     <span class="name">Manny T.</span>
                     <span class="detail">Frontend Developer</span>
-                  <span class="detail">Monkey with wrench</span>
-                    <button class="primary info-btn">Beans</button>
-                </div> 
+                    <span class="detail">Monkey with wrench</span>
+                    <div id="spacer" style="margin: 32px 0px;"></div>
+                  </div>
             </div>
 
             <!-- 3 -->
@@ -244,7 +276,7 @@
             <div class="info-container">
               <div id="name" class="info">
                 <span class="name">Brendan K.</span>
-                <span class="detail">Cpt 3 formatter</span>
+                <span class="detail">GPT-3 Formatter</span>
                 <button class="primary info-btn" onclick="window.open('https://www.linkedin.com/in/brendan-keane-1746bb204', '_blank');">LinkedIn</button>
                 
               </div>
@@ -274,23 +306,98 @@
                 <div id="name" class="info">
                     <span class="name">Haley G</span>
                     <span class="detail">Frontend Developer</span>
+                    <span class="detail">Used Python, Py Flask,</span>
+                    <span class="detail">HTML, CSS, JS, etc.</span>
                     <button class="primary info-btn" onclick="window.open( 'https://linktr.ee/_haley_','_blank')">LinkTree</button>
                 </div> 
                 <div id="name" class="info">
                     <span class="name">David T</span>
                     <span class="detail"><i>Cloned</i> a GitHub repository</span>
-                    <button class="primary info-btn" onclick="window.open('https://www.wikipedia.org/', '_blank');">wiki</button>
+                    <button class="primary info-btn" onclick="window.open('https://www.linkedin.com/in/david-tuvshin-5852b5216/', '_blank');">LinkedIn</button>
                 </div>
             </div>
         </div>
         <div id="banner-aicamp" class="banner">
-
+          <a>
+            <img style="width: 128px; z-index: 1;" src="{{url_for('static', filename='ai_camp_logo.png')}}" />
+          </a>
+          <span class="banner-text">www.ai-camp.org</span>
+          <button style="z-index: 1;" class="secondary" onclick="window.open('https://www.ai-camp.org/','_blank')">Learn Now</button>
         </div>
     </body>
 
   <script>
-    function fileget(){
+    let isRand = false;
+    let isImage = false; // If we took a picture for our recipe
+
+    const printRecipe = () => {
+      let page = window.open('', '', 'height=500, width=500');
+      // (genTitle, genIngredients, genInstructions);
+      page.document.write(`
+        <html>
+          <body>
+            <h1>${currentRecipe[0] /* title */}</h1>
+            <br />
+
+            <h2>Ingredients</h2>
+            <p>${currentRecipe[1].join('<br />')}</p>
+            <br />
+
+            <h2>Instructions</h2>
+            <p>${currentRecipe[2].join('<br />')}</p>
+            <br />
+            <br />
+
+            <p>Recipe generated by PizzaAi.</p>
+          </body>
+        </html>
+      `);
+
+      page.document.close();
+      page.print();
+    }
+
+    function checkRecipe(){
+      console.log({{recipe|safe}})
+      var recipe = {{recipe|safe}}
+      if(recipe != ""){
+        let main = ["title", "ic", "error", "list", "btn-main"]
+        main.forEach((elm) => {
+            _$(elm).style.display = "none";
+        });
+
+        isImage = true;
+        setRecipe(recipe)
+      }
+    };
+
+    function fileget() {
       document.getElementById("file").click();
+    };
+
+    function retry() {
+      let shuffledIngredients;
+
+      if (isRand) {
+        shuffledIngredients = randomize();
+      } else {
+        shuffledIngredients = ingredients.sort(() => Math.random() - 0.5); // Randomize the list 
+      }
+
+      // Clear the title
+      _$("r-title").innerHtml = '';
+
+      // Delete any child nodes from the step and ingredient containers
+      let containers = ["r-ing-container", "r-step-container"];
+
+      for (let i = 0; i < containers.length; i++) {
+        while (_$(containers[i]).firstChild) {
+          _$(containers[i]).removeChild(_$(containers[i]).firstChild);
+        }
+      }
+
+      
+      return shuffledIngredients;
     };
 
     function sendResults(rand) {
@@ -322,22 +429,27 @@
 
         console.log(ingredients);
 
-        let username = "Hello"
-
         var obj = {
           'input': data
         }
 
-        $.ajax({
-            url: "{{url_for('my_function')}}",
-            contentType: "application/json",
-            type: 'POST',
-            data: JSON.stringify(obj),
-            success: (res) => {
-                console.log(res)
-                setRecipe(res);
-            }
-        });
+      $.ajax({
+          url: "{{url_for('my_function')}}",
+          contentType: "application/json",
+          type: 'POST',
+          data: JSON.stringify(obj),
+          success: (res) => {
+              console.log(res)
+              setRecipe(res);
+          },
+          error: (err) => {
+            console.log(err)
+            let elms = ["errIco", "woopsie", "genError", "errRetry"];
+            elms.forEach(elm => {
+              document.getElementById(elm).style.display = "flex";
+            });
+          }
+      });
     }
   </script>
 </html>
